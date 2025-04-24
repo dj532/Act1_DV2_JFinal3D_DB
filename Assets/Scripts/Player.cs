@@ -9,6 +9,7 @@ public class Player : MonoBehaviour, Danhable
     [SerializeField] private float factorGravedad;
     [SerializeField] private float alturaDeSalto;
     [SerializeField] private Animator anim;
+    [SerializeField] private ParticleSystem particulas;
 
     [Header("Deteccion Suelo")]
     [SerializeField] private Transform pies;
@@ -25,6 +26,9 @@ public class Player : MonoBehaviour, Danhable
     [SerializeField] private float distanciaDisparo;
     [SerializeField] private float danhoDisparo;
 
+    [SerializeField] ControlGameOver controlGameOver;
+    private AudioSource audioSource;
+
     private void OnEnable()
     {
         inputManager.OnSaltar += Saltar;
@@ -32,17 +36,39 @@ public class Player : MonoBehaviour, Danhable
         inputManager.OnRecargar += Recargar;
         inputManager.OnDisparar += Disparar;
     }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        controller = GetComponent<CharacterController>();
+        audioSource = GetComponent<AudioSource>();
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+        AplicarMovimiento();
+
+        ActualizarMovimiento();
+        ManejarVelocidadVertical();
+
+    }
     private void Disparar()
     {
         anim.SetTrigger("Shoot");
+        audioSource.Play();
+        particulas.Play();
         //saber si impacta con algo
         if (Physics.Raycast(camara.position, camara.forward,out RaycastHit hitInfo, distanciaDisparo))
         {
             // saber si lo impactado es dañable
             if (hitInfo.transform.TryGetComponent(out Danhable sistemaDanho))
             {
-                sistemaDanho.RecibirDanho(danhoDisparo);
+                if (!hitInfo.transform.CompareTag("Player"))
+                {
+                    sistemaDanho.RecibirDanho(danhoDisparo);
+                }
+                
             }
         }
     }
@@ -67,26 +93,8 @@ public class Player : MonoBehaviour, Danhable
         }
         
     }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        controller = GetComponent<CharacterController>();
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Mover();
-
-        ActualizarMovimiento();
-        ManejarVelocidadVertical();
-
-    }
-
-    private void Mover()
+    private void AplicarMovimiento()
     {
         direccionMovimiento = camara.forward * direccionInput.z + camara.right * direccionInput.x;
         direccionMovimiento.y = 0;
@@ -133,18 +141,18 @@ public class Player : MonoBehaviour, Danhable
         Quaternion rotacionObjetivo = Quaternion.LookRotation(direccionMovimiento);
         transform.rotation = rotacionObjetivo;
     }
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawSphere(pies.position, radioDeteccion);
-    }
-
     void Danhable.RecibirDanho(float danho)
     {
         vidas -= danho;
         if (vidas <= 0)
         {
-            Destroy(this.gameObject);
+            anim.SetTrigger("Death");
+            controlGameOver.GameOver();
         }
 
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(pies.position, radioDeteccion);
     }
 }
