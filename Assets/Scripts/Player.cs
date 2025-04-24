@@ -1,12 +1,14 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, Danhable
+
 {
     [SerializeField] private float velocidadMovimiento;
     [SerializeField] private Transform camara;
     [SerializeField] private InputManagerSO inputManager;
     [SerializeField] private float factorGravedad;
     [SerializeField] private float alturaDeSalto;
+    [SerializeField] private Animator anim;
 
     [Header("Deteccion Suelo")]
     [SerializeField] private Transform pies;
@@ -18,16 +20,42 @@ public class Player : MonoBehaviour
     private Vector3 direccionInput;
     private Vector3 velocidadVertical;
 
+    [Header ("Sistema Combate")]
+    [SerializeField] private float vidas;
+    [SerializeField] private float distanciaDisparo;
+    [SerializeField] private float danhoDisparo;
+
     private void OnEnable()
     {
         inputManager.OnSaltar += Saltar;
         inputManager.OnMover += Mover; ;
+        inputManager.OnRecargar += Recargar;
+        inputManager.OnDisparar += Disparar;
+    }
+
+    private void Disparar()
+    {
+        anim.SetTrigger("Shoot");
+        //saber si impacta con algo
+        if (Physics.Raycast(camara.position, camara.forward,out RaycastHit hitInfo, distanciaDisparo))
+        {
+            // saber si lo impactado es dañable
+            if (hitInfo.transform.TryGetComponent(out Danhable sistemaDanho))
+            {
+                sistemaDanho.RecibirDanho(danhoDisparo);
+            }
+        }
+    }
+
+    private void Recargar()
+    {
+        anim.SetTrigger("Reload");
     }
 
     private void Mover(Vector2 ctx)
     {
         direccionInput = new Vector3(ctx.x, 0, ctx.y);
-        
+                
     }
 
     private void Saltar()
@@ -51,26 +79,45 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Mover();
+
+        ActualizarMovimiento();
+        ManejarVelocidadVertical();
+
+    }
+
+    private void Mover()
+    {
         direccionMovimiento = camara.forward * direccionInput.z + camara.right * direccionInput.x;
         direccionMovimiento.y = 0;
         controller.Move(direccionMovimiento * velocidadMovimiento * Time.deltaTime);
-        
+    }
 
-        if(direccionMovimiento.sqrMagnitude > 0)
-        {
-            RotarHaciaDestino();
-        }
-        // Si hemos aterrizzado...
+    private void ManejarVelocidadVertical()
+    {
+        // Si hemos aterizado...
         if (EstoyEnSuelo() && velocidadVertical.y < 0)
         {
             //se resetea velocidad vertical
             velocidadVertical.y = 0;
-            
+
         }
         AplicarGravedad();
-
     }
+
+    private void ActualizarMovimiento()
+    {
+        if (direccionMovimiento.sqrMagnitude > 0)
+        {
+            anim.SetBool("Walking", true);
+            RotarHaciaDestino();
+        }
+        else
+        {
+            anim.SetBool("Walking", false);
+        }
+    }
+
     private void AplicarGravedad()
     {
         velocidadVertical.y += factorGravedad * Time.deltaTime;
@@ -89,5 +136,15 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawSphere(pies.position, radioDeteccion);
+    }
+
+    void Danhable.RecibirDanho(float danho)
+    {
+        vidas -= danho;
+        if (vidas <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+
     }
 }

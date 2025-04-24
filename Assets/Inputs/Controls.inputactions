@@ -31,6 +31,24 @@
                     "processors": "StickDeadzone(min=0.21)",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Disparar",
+                    "type": "Value",
+                    "id": "512040ec-d177-48e2-90b0-ee4b74f5db89",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Recargar",
+                    "type": "Button",
+                    "id": "6806f4df-bd23-479c-a9a4-1d6cde5c12ce",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -196,6 +214,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "MoverCamara",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b255ebd1-3414-4499-8a6c-2281687d443d",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Disparar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2a3874ee-0fa9-4a87-9a89-d802d2872ade",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Disparar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7cf0773b-7eed-4dcd-a43a-bd4b4bac1c2c",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Recargar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "958fb77c-aff6-4c9f-885b-7040f5228426",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Recargar",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

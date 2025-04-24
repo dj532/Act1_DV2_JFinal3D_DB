@@ -53,6 +53,24 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": ""StickDeadzone(min=0.21)"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Disparar"",
+                    ""type"": ""Value"",
+                    ""id"": ""512040ec-d177-48e2-90b0-ee4b74f5db89"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Recargar"",
+                    ""type"": ""Button"",
+                    ""id"": ""6806f4df-bd23-479c-a9a4-1d6cde5c12ce"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -220,6 +238,50 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""MoverCamara"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b255ebd1-3414-4499-8a6c-2281687d443d"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Disparar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2a3874ee-0fa9-4a87-9a89-d802d2872ade"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Disparar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7cf0773b-7eed-4dcd-a43a-bd4b4bac1c2c"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Recargar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""958fb77c-aff6-4c9f-885b-7040f5228426"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Recargar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -231,6 +293,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Gameplay_Saltar = m_Gameplay.FindAction("Saltar", throwIfNotFound: true);
         m_Gameplay_Mover = m_Gameplay.FindAction("Mover", throwIfNotFound: true);
         m_Gameplay_MoverCamara = m_Gameplay.FindAction("MoverCamara", throwIfNotFound: true);
+        m_Gameplay_Disparar = m_Gameplay.FindAction("Disparar", throwIfNotFound: true);
+        m_Gameplay_Recargar = m_Gameplay.FindAction("Recargar", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -300,6 +364,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Saltar;
     private readonly InputAction m_Gameplay_Mover;
     private readonly InputAction m_Gameplay_MoverCamara;
+    private readonly InputAction m_Gameplay_Disparar;
+    private readonly InputAction m_Gameplay_Recargar;
     public struct GameplayActions
     {
         private @Controls m_Wrapper;
@@ -307,6 +373,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Saltar => m_Wrapper.m_Gameplay_Saltar;
         public InputAction @Mover => m_Wrapper.m_Gameplay_Mover;
         public InputAction @MoverCamara => m_Wrapper.m_Gameplay_MoverCamara;
+        public InputAction @Disparar => m_Wrapper.m_Gameplay_Disparar;
+        public InputAction @Recargar => m_Wrapper.m_Gameplay_Recargar;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -325,6 +393,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @MoverCamara.started += instance.OnMoverCamara;
             @MoverCamara.performed += instance.OnMoverCamara;
             @MoverCamara.canceled += instance.OnMoverCamara;
+            @Disparar.started += instance.OnDisparar;
+            @Disparar.performed += instance.OnDisparar;
+            @Disparar.canceled += instance.OnDisparar;
+            @Recargar.started += instance.OnRecargar;
+            @Recargar.performed += instance.OnRecargar;
+            @Recargar.canceled += instance.OnRecargar;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -338,6 +412,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @MoverCamara.started -= instance.OnMoverCamara;
             @MoverCamara.performed -= instance.OnMoverCamara;
             @MoverCamara.canceled -= instance.OnMoverCamara;
+            @Disparar.started -= instance.OnDisparar;
+            @Disparar.performed -= instance.OnDisparar;
+            @Disparar.canceled -= instance.OnDisparar;
+            @Recargar.started -= instance.OnRecargar;
+            @Recargar.performed -= instance.OnRecargar;
+            @Recargar.canceled -= instance.OnRecargar;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -360,5 +440,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnSaltar(InputAction.CallbackContext context);
         void OnMover(InputAction.CallbackContext context);
         void OnMoverCamara(InputAction.CallbackContext context);
+        void OnDisparar(InputAction.CallbackContext context);
+        void OnRecargar(InputAction.CallbackContext context);
     }
 }
